@@ -3,42 +3,75 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ingresar Producto</title>
+  <title>Registrar Ticket</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="container">
-    <h1 id="tituloFormulario">Ingresar Producto</h1>
+  <div class="container" style="max-width: 600px; margin-top: 30px;">
+    <h1>Crear Solicitud de Soporte</h1>
 
-    <section class="card">
-      <form id="formProducto">
-        <div class="grupo">
-          <label for="nombre">Nombre</label>
-          <input type="text" id="nombre" name="nombre" required>
+    <section class="card" style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+      <form id="formTicket">
+        <div class="grupo" style="margin-bottom: 15px;">
+          <label for="nombreSolicitante" style="display: block; margin-bottom: 5px; font-weight: bold;">Nombre Completo del Solicitante</label>
+          <input type="text" id="nombreSolicitante" required placeholder="Ej: Juan Pérez" style="width: 100%; padding: 10px; box-sizing: border-box;">
         </div>
 
-        <div class="grupo">
-          <label for="categoria">Categoría</label>
-          <input type="text" id="categoria" name="categoria" required>
+        <div class="grupo" style="margin-bottom: 15px;">
+          <label for="correo" style="display: block; margin-bottom: 5px; font-weight: bold;">Correo Electrónico Institucional</label>
+          <input type="email" id="correo" required placeholder="usuario@institucion.cl" style="width: 100%; padding: 10px; box-sizing: border-box;">
         </div>
 
-        <div class="grupo">
-          <label for="precio">Precio</label>
-          <input type="number" id="precio" name="precio" min="0" step="0.01" required>
+        <div class="grupo" style="margin-bottom: 15px;">
+          <label for="categoria" style="display: block; margin-bottom: 5px; font-weight: bold;">Categoría del Requerimiento</label>
+          <select id="categoria" required style="width:100%; padding:10px; box-sizing: border-box;">
+            <option value="hardware">Hardware</option>
+            <option value="software">Software</option>
+            <option value="red">Redes</option>
+            <option value="cuenta">Gestión de Cuentas</option>
+            <option value="otro">Otro</option>
+          </select>
         </div>
 
-        <div class="grupo">
-          <label for="stock">Stock</label>
-          <input type="number" id="stock" name="stock" min="0" step="1" required>
+        <div class="grupo" style="margin-bottom: 15px;">
+          <label for="impacto" style="display: block; margin-bottom: 5px; font-weight: bold;">Nivel de Impacto en el Negocio</label>
+          <select id="impacto" required style="width:100%; padding:10px; box-sizing: border-box;">
+            <option value="bajo">Bajo (Afecta a un solo usuario)</option>
+            <option value="medio">Medio (Afecta a un grupo)</option>
+            <option value="alto">Alto (Afecta a toda la sede)</option>
+          </select>
         </div>
 
-        <div class="barra-superior">
-          <button type="submit" id="btnGuardar">Guardar</button>
-          <button type="button" id="btnVolver" class="btn-secundario">Volver al listado</button>
+        <div class="grupo" style="margin-bottom: 15px;">
+          <label for="urgencia" style="display: block; margin-bottom: 5px; font-weight: bold;">Nivel de Urgencia Asignada</label>
+          <select id="urgencia" required style="width:100%; padding:10px; box-sizing: border-box;">
+            <option value="baja">Baja (Puede esperar)</option>
+            <option value="media">Media (Requiere atención el mismo día)</option>
+            <option value="alta">Alta (Trabajo bloqueado completamente)</option>
+          </select>
+        </div>
+
+        <div class="grupo" style="margin-bottom: 15px;">
+          <label for="tiempoEstimado" style="display: block; margin-bottom: 5px; font-weight: bold;">Tiempo Estimado de Solución</label>
+          <input type="number" id="tiempoEstimado" min="1" max="120" required placeholder="Ej: 3" style="width: 100%; padding: 10px; box-sizing: border-box;">
+        </div>
+
+        <div class="grupo" style="margin-bottom: 20px;">
+          <label for="descripcion" style="display: block; margin-bottom: 5px; font-weight: bold;">Descripción Breve del Incidente</label>
+          <textarea id="descripcion" rows="4" style="width:100%; box-sizing:border-box; padding:10px;" required placeholder="Escriba los detalles aquí..."></textarea>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <button type="submit" style="flex: 1; padding: 10px; background: #5cb85c; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">
+            Enviar Requerimiento
+          </button>
+          <button type="button" id="btnVolver" style="padding: 10px; background: #f0ad4e; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">
+            Volver al Panel
+          </button>
         </div>
       </form>
 
-      <div id="mensaje"></div>
+      <div id="mensaje" style="margin-top: 15px; text-align: center; font-weight: bold;"></div>
     </section>
   </div>
 

@@ -1,34 +1,40 @@
 const formLogin = document.getElementById('formLogin');
+const usuarioInput = document.getElementById('usuario');
+const contrasenaInput = document.getElementById('contrasena');
 const mensaje = document.getElementById('mensaje');
-const btnVolver = document.getElementById('btnVolver');
-
-btnVolver.addEventListener('click', () => {
-  window.location.href = '/';
-});
 
 formLogin.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const usuario = document.getElementById('usuario').value.trim();
-  const password = document.getElementById('password').value.trim();
+  const usuario = usuarioInput.value.trim();
+  const contrasena = contrasenaInput.value.trim();
+  mensaje.innerHTML = '';
 
   try {
     const response = await fetch('/api/auth/login', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ usuario, password })
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include', 
+      body: JSON.stringify({ usuario, contrasena })
     });
 
     const data = await response.json();
 
-    if (data.ok) {
-      mensaje.innerHTML = `<p class="exito">${data.mensaje}</p>`;
-      setTimeout(() => { window.location.href = '/'; }, 700);
+    if (response.ok && data.ok) {
+      mensaje.style.color = 'green';
+      mensaje.textContent = data.mensaje;
+      
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1500);
     } else {
-      mensaje.innerHTML = `<p class="error">${data.mensaje}</p>`;
+      mensaje.style.color = 'red';
+      mensaje.textContent = data.mensaje || 'Error al intentar iniciar sesión.';
     }
   } catch (error) {
-    mensaje.innerHTML = '<p class="error">Error de conexión con el servidor.</p>';
+    mensaje.style.color = 'red';
+    mensaje.textContent = 'Hubo un error de conexión con el servidor.';
   }
 });

@@ -3,42 +3,45 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Listado de Productos</title>
+  <title>HelpDesk Smart Priority - Panel</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <div class="container">
-    <h1>Listado de Productos</h1>
+    <h1>HelpDesk Smart Priority</h1>
 
     <section class="card">
-      <div class="barra-superior barra-login">
-        <span id="estadoSesion" class="estado-sesion">Verificando sesión...</span>
-        <button id="btnLogin" class="btn-secundario">Iniciar sesión</button>
-        <button id="btnLogout" class="btn-peligro">Cerrar sesión</button>
+      <div class="barra-superior barra-login" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: #f4f4f4; padding: 10px; border-radius: 4px;">
+        <span id="estadoSesion" class="estado-sesion" style="font-weight: bold; color: #555;">Verificando sesión</span>
+        <div>
+          <button id="btnLogin" class="btn-secundario" style="padding: 6px 12px; cursor: pointer;">Iniciar sesión</button>
+          <button id="btnLogout" class="btn-peligro" style="padding: 6px 12px; background: #d9534f; color: white; border: none; border-radius: 4px; cursor: pointer; display: none;">Cerrar sesión</button>
+        </div>
       </div>
 
-      <div class="barra-superior">
-        <button id="btnAgregar" class="btn-secundario">Agregar producto</button>
-        <button id="btnCargar">Cargar listado</button>
+      <div class="barra-superior" style="margin-bottom: 15px;">
+        <button id="btnAgregar" class="btn-secundario" style="padding: 10px 15px; cursor: pointer; margin-right: 10px;">Registrar Nuevo Ticket</button>
+        <button id="btnCargar" style="padding: 10px 15px; cursor: pointer;">Refrescar Listado</button>
       </div>
 
-      <div id="mensaje"></div>
+      <div id="mensaje" style="margin-bottom: 15px;"></div>
 
       <div class="tabla-responsive">
-        <table class="tabla">
+        <table class="tabla" style="width: 100%; border-collapse: collapse; text-align: left;">
           <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nombre</th>
-              <th>Categoría</th>
-              <th>Precio</th>
-              <th>Stock</th>
-              <th>Acciones</th>
+            <tr style="background: #333; color: white;">
+              <th style="padding: 10px; border: 1px solid #ddd;">ID</th>
+              <th style="padding: 10px; border: 1px solid #ddd;">Solicitante</th>
+              <th style="padding: 10px; border: 1px solid #ddd;">Categoría</th>
+              <th style="padding: 10px; border: 1px solid #ddd;">Urgencia / Impacto</th>
+              <th style="padding: 10px; border: 1px solid #ddd;">Estado</th>
+              <th style="padding: 10px; border: 1px solid #ddd;">Prioridad Calculada</th>
+              <th style="padding: 10px; border: 1px solid #ddd;">Acciones</th>
             </tr>
           </thead>
-          <tbody id="tablaProductosBody">
+          <tbody id="tablaTicketsBody">
             <tr>
-              <td colspan="6">Presione "Cargar listado" para mostrar los productos.</td>
+              <td colspan="7" style="padding: 15px; text-align: center;">Cargando solicitudes</td>
             </tr>
           </tbody>
         </table>

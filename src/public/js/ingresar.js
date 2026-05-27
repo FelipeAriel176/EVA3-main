@@ -1,99 +1,54 @@
-const formProducto = document.getElementById('formProducto');
+const formTicket = document.getElementById('formTicket');
 const mensaje = document.getElementById('mensaje');
 const btnVolver = document.getElementById('btnVolver');
-const tituloFormulario = document.getElementById('tituloFormulario');
-const btnGuardar = document.getElementById('btnGuardar');
 
-const parametros = new URLSearchParams(window.location.search);
-const productoId = parametros.get('id');
-const modoEdicion = productoId !== null;
-
-btnVolver.addEventListener('click', () => { window.location.href = '/'; });
+btnVolver.addEventListener('click', () => { window.location.href = 'index.html'; });
 
 document.addEventListener('DOMContentLoaded', async () => {
-  await verificarAcceso();
-
-  if (modoEdicion) {
-    tituloFormulario.textContent = 'Actualizar Producto';
-    btnGuardar.textContent = 'Actualizar';
-    await cargarProductoParaEditar(productoId);
-  }
-});
-
-async function verificarAcceso() {
   try {
     const response = await fetch('/api/auth/perfil', { credentials: 'include' });
     const data = await response.json();
 
     if (!data.ok) {
-      mensaje.innerHTML = `<p class="error">${data.mensaje}</p>`;
-      formProducto.style.display = 'none';
-      setTimeout(() => { window.location.href = 'login.html'; }, 1200);
+      mensaje.innerHTML = `<p style="color:red; font-weight:bold;">Acceso denegado: Debes iniciar sesión para crear un ticket.</p>`;
+      formTicket.style.display = 'none';
+      setTimeout(() => { window.location.href = 'login.html'; }, 1500);
     }
   } catch (error) {
-    mensaje.innerHTML = '<p class="error">No se pudo validar la sesión.</p>';
-    formProducto.style.display = 'none';
+    mensaje.innerHTML = '<p style="color:red;">Error al validar la sesión activa.</p>';
+    formTicket.style.display = 'none';
   }
-}
+});
 
-formProducto.addEventListener('submit', async (e) => {
+formTicket.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const nombre = document.getElementById('nombre').value.trim();
-  const categoria = document.getElementById('categoria').value.trim();
-  const precio = document.getElementById('precio').value.trim();
-  const stock = document.getElementById('stock').value.trim();
-
-  if (!nombre || !categoria || !precio || !stock) {
-    mensaje.innerHTML = '<p class="error">Todos los campos son obligatorios.</p>';
-    return;
-  }
-
-  const url = modoEdicion ? `/api/productos/${productoId}` : '/api/productos';
-  const metodo = modoEdicion ? 'PUT' : 'POST';
+  const nombreSolicitante = document.getElementById('nombreSolicitante').value.trim();
+  const correo = document.getElementById('correo').value.trim();
+  const categoria = document.getElementById('categoria').value;
+  const impacto = document.getElementById('impacto').value;
+  const urgencia = document.getElementById('urgencia').value;
+  const tiempoEstimado = document.getElementById('tiempoEstimado').value;
+  const descripcion = document.getElementById('descripcion').value.trim();
 
   try {
-    const response = await fetch(url, {
-      method: metodo,
+    const response = await fetch('/api/tickets', {
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body: JSON.stringify({ nombre, categoria, precio, stock })
+      body: JSON.stringify({ nombreSolicitante, correo, categoria, impacto, urgencia, tiempoEstimado, descripcion })
     });
 
     const data = await response.json();
 
-    if (data.ok) {
-      mensaje.innerHTML = `<p class="exito">${data.mensaje}</p>`;
-      if (!modoEdicion) formProducto.reset();
-      setTimeout(() => { window.location.href = '/'; }, 1000);
+    if (response.ok && data.ok) {
+      mensaje.innerHTML = `<p style="color:green; font-weight:bold;">${data.mensaje} Redireccionando...</p>`;
+      formTicket.reset();
+      setTimeout(() => { window.location.href = 'index.html'; }, 1500);
     } else {
-      mensaje.innerHTML = `<p class="error">${data.mensaje}</p>`;
-      if (response.status === 401) {
-        setTimeout(() => { window.location.href = 'login.html'; }, 1200);
-      }
+      mensaje.innerHTML = `<p style="color:red; font-weight:bold;">${data.mensaje}</p>`;
     }
   } catch (error) {
-    mensaje.innerHTML = '<p class="error">Error de conexión con el servidor.</p>';
+    mensaje.innerHTML = '<p style="color:red;">Error crítico de red al conectar con el servidor.</p>';
   }
 });
-
-async function cargarProductoParaEditar(id) {
-  try {
-    const response = await fetch(`/api/productos/${id}`);
-    const data = await response.json();
-
-    if (!data.ok) {
-      mensaje.innerHTML = `<p class="error">${data.mensaje}</p>`;
-      formProducto.style.display = 'none';
-      return;
-    }
-
-    document.getElementById('nombre').value = data.data.nombre;
-    document.getElementById('categoria').value = data.data.categoria;
-    document.getElementById('precio').value = data.data.precio;
-    document.getElementById('stock').value = data.data.stock;
-  } catch (error) {
-    mensaje.innerHTML = '<p class="error">Error al cargar el producto.</p>';
-    formProducto.style.display = 'none';
-  }
-}

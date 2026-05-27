@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const filePath = path.join(__dirname, '../data/tickets.json');
-
 function leerTickets() {
     try {
         if (!fs.existsSync(filePath)) {
@@ -14,7 +13,6 @@ function leerTickets() {
         return [];
     }
 }
-
 function guardarTickets(listaTickets) {
     try {
         fs.writeFileSync(filePath, JSON.stringify(listaTickets, null, 2), 'utf-8');
@@ -22,7 +20,6 @@ function guardarTickets(listaTickets) {
         console.error("Error escribiendo en la base de datos:", error);
     }
 }
-
 module.exports = {
     leerTickets,
     guardarTickets

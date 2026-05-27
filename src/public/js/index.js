@@ -3,27 +3,17 @@ const btnCargar = document.getElementById('btnCargar');
 const btnLogin = document.getElementById('btnLogin');
 const btnLogout = document.getElementById('btnLogout');
 const estadoSesion = document.getElementById('estadoSesion');
-const tablaProductosBody = document.getElementById('tablaProductosBody');
+const tablaTicketsBody = document.getElementById('tablaTicketsBody');
 const mensaje = document.getElementById('mensaje');
 
-btnAgregar.addEventListener('click', () => { window.location.href = 'ingresar.html'; });
-btnCargar.addEventListener('click', cargarProductos);
+btnAgregar.addEventListener('click', () => { window.location.href = 'CrearTicket.html'; });
+btnCargar.addEventListener('click', cargarTickets);
 btnLogin.addEventListener('click', () => { window.location.href = 'login.html'; });
 btnLogout.addEventListener('click', cerrarSesion);
 
 document.addEventListener('DOMContentLoaded', async () => {
   await verificarSesion();
-  await cargarProductos();
-});
-
-document.addEventListener('click', async (e) => {
-  if (e.target.classList.contains('btn-eliminar')) {
-    await eliminarProducto(e.target.dataset.id);
-  }
-
-  if (e.target.classList.contains('btn-actualizar')) {
-    window.location.href = `ingresar.html?id=${e.target.dataset.id}`;
-  }
+  await cargarTickets();
 });
 
 async function verificarSesion() {
@@ -35,86 +25,104 @@ async function verificarSesion() {
       estadoSesion.textContent = `Sesión activa: ${data.usuario}`;
       btnLogin.style.display = 'none';
       btnLogout.style.display = 'inline-block';
+      return true;
     } else {
       mostrarSesionInactiva();
+      return false;
     }
   } catch (error) {
     mostrarSesionInactiva();
+    return false;
   }
 }
 
 function mostrarSesionInactiva() {
-  estadoSesion.textContent = 'Sin sesión activa. Puede listar, pero no crear, actualizar o eliminar.';
+  estadoSesion.textContent = 'Sin sesión activa. Modo Lectura habilitado.';
   btnLogin.style.display = 'inline-block';
   btnLogout.style.display = 'none';
 }
 
-async function cargarProductos() {
+async function cargarTickets() {
   mensaje.innerHTML = '';
-
   try {
-    const response = await fetch('/api/productos');
-    const data = await response.json();
+    const response = await fetch('/api/tickets');
+    const resJson = await response.json();
 
-    if (!data.ok || data.data.length === 0) {
-      tablaProductosBody.innerHTML = '<tr><td colspan="6">No hay productos registrados.</td></tr>';
+    if (!resJson.data || resJson.data.length === 0) {
+      tablaTicketsBody.innerHTML = '<tr><td colspan="7" style="padding:15px; text-align:center;">No hay tickets de soporte registrados actualmente.</td></tr>';
       return;
     }
 
-    tablaProductosBody.innerHTML = data.data.map(producto => `
-      <tr>
-        <td>${producto.id}</td>
-        <td>${producto.nombre}</td>
-        <td>${producto.categoria}</td>
-        <td>$${Number(producto.precio).toFixed(2)}</td>
-        <td>${producto.stock}</td>
-        <td>
-          <button class="btn-accion btn-actualizar" data-id="${producto.id}">Actualizar</button>
-          <button class="btn-accion btn-eliminar btn-peligro" data-id="${producto.id}">Eliminar</button>
+    tablaTicketsBody.innerHTML = resJson.data.map(ticket => `
+      <tr style="border-bottom: 1px solid #ddd;">
+        <td style="padding:10px;">${ticket.id.slice(-6)}</td>
+        <td style="padding:10px;"><strong>${ticket.nombreSolicitante}</strong><br><small style="color:#666;">${ticket.correo}</small></td>
+        <td style="padding:10px;"><span style="background:#e0e0e0; padding:2px 6px; border-radius:3px; font-size:12px;">${ticket.categoria}</span></td>
+        <td style="padding:10px;">U: ${ticket.urgencia} / I: ${ticket.impacto}</td>
+        <td style="padding:10px;">
+          <select onchange="cambiarEstado('${ticket.id}', this.value)" style="padding:4px;">
+            <option value="pendiente" ${ticket.estado === 'pendiente' ? 'selected' : ''}>Pendiente</option>
+            <option value="en proceso" ${ticket.estado === 'en proceso' ? 'selected' : ''}>En Proceso</option>
+            <option value="resuelto" ${ticket.estado === 'resuelto' ? 'selected' : ''}>Resuelto</option>
+          </select>
+        </td>
+        <td style="padding:10px;"><strong>${ticket.prioridad}</strong></td>
+        <td style="padding:10px;">
+          <button class="btn-peligro" style="padding: 4px 8px; font-size:12px; background:#d9534f; color:white; border:none; border-radius:3px; cursor:pointer;" onclick="eliminarTicket('${ticket.id}')">Eliminar</button>
         </td>
       </tr>
     `).join('');
   } catch (error) {
-    tablaProductosBody.innerHTML = '<tr><td colspan="6">Error al cargar los productos.</td></tr>';
+    tablaTicketsBody.innerHTML = '<tr><td colspan="7" style="padding:15px; text-align:center; color:red;">Error de conexión al cargar los tickets.</td></tr>';
   }
 }
 
-async function eliminarProducto(id) {
-  if (!confirm('¿Desea eliminar este producto?')) return;
-
+async function cambiarEstado(id, nuevoEstado) {
   try {
-    const response = await fetch(`/api/productos/${id}`, {
+    const response = await fetch(`/api/tickets/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ estado: nuevoEstado })
+    });
+    const data = await response.json();
+    if (data.ok) {
+      mensaje.innerHTML = `<p style="color:green; font-weight:bold;">${data.mensaje}</p>`;
+      cargarTickets();
+    } else {
+      mensaje.innerHTML = `<p style="color:red; font-weight:bold;">${data.mensaje}</p>`;
+      if(response.status === 401) setTimeout(() => window.location.href = 'login.html', 1500);
+    }
+  } catch (error) {
+    mensaje.innerHTML = '<p style="color:red;">Error al procesar el cambio de estado.</p>';
+  }
+}
+
+async function eliminarTicket(id) {
+  if (!confirm('¿Seguro que desea eliminar esta solicitud de soporte?')) return;
+  try {
+    const response = await fetch(`/api/tickets/${id}`, {
       method: 'DELETE',
       credentials: 'include'
     });
-
     const data = await response.json();
-
     if (data.ok) {
-      mensaje.innerHTML = `<p class="exito">${data.mensaje}</p>`;
-      await cargarProductos();
+      mensaje.innerHTML = `<p style="color:green; font-weight:bold;">${data.mensaje}</p>`;
+      cargarTickets();
     } else {
-      mensaje.innerHTML = `<p class="error">${data.mensaje}</p>`;
-      if (response.status === 401) {
-        setTimeout(() => { window.location.href = 'login.html'; }, 1200);
-      }
+      mensaje.innerHTML = `<p style="color:red; font-weight:bold;">${data.mensaje}</p>`;
+      if(response.status === 401) setTimeout(() => window.location.href = 'login.html', 1500);
     }
   } catch (error) {
-    mensaje.innerHTML = '<p class="error">Error al eliminar el producto.</p>';
+    mensaje.innerHTML = '<p style="color:red;">Error al conectar con el endpoint de eliminación.</p>';
   }
 }
 
 async function cerrarSesion() {
   try {
-    const response = await fetch('/api/auth/logout', {
-      method: 'POST',
-      credentials: 'include'
-    });
-
-    const data = await response.json();
-    mensaje.innerHTML = `<p class="exito">${data.mensaje}</p>`;
-    await verificarSesion();
+    const response = await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    window.location.reload();
   } catch (error) {
-    mensaje.innerHTML = '<p class="error">Error al cerrar sesión.</p>';
+    mensaje.innerHTML = '<p style="color:red;">Error al procesar el cierre de sesión.</p>';
   }
 }
