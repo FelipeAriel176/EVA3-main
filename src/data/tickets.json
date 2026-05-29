@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "id": "1780096930148",
+    "nombreSolicitante": "Juan Perez",
+    "correo": "juan.perez@alumnos.santotomas.cl",
+    "categoria": "hardware",
+    "descripcion": "el pc no prende",
+    "impacto": "bajo",
+    "urgencia": "baja",
+    "tiempoEstimado": 2,
+    "estado": "pendiente",
+    "prioridad": "Baja",
+    "fechaCreacion": "2026-05-29T23:22:10.149Z"
+  }
+]
